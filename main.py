@@ -27,8 +27,8 @@ pygame.display.set_caption("Solar System Simulation")
 #         end_y = center[1] + radius * math.sin(math.radians(angle + dash_length))
 
 #         pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), 1)
-#Planet Class
 
+#Planet Class
 class Planet:
     def __init__(self, x, y, radius, color, orbit_radius, speed):
         self.x = x
