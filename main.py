@@ -19,6 +19,14 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
 pygame.display.set_caption("Solar System Simulation")
 
 # Planet Class
+def draw_dashed_circle(surface, center, radius, color, dash_length=10, gap_length=5):
+    for angle in range(0, 360, dash_length + gap_length):
+        start_x = center[0] + radius * math.cos(math.radians(angle))
+        start_y = center[1] + radius * math.sin(math.radians(angle))
+        end_x = center[0] + radius * math.cos(math.radians(angle + dash_length))
+        end_y = center[1] + radius * math.sin(math.radians(angle + dash_length))
+
+        pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), 1)
 class Planet:
     def __init__(self, x, y, radius, color, orbit_radius, speed):
         self.x = x
@@ -44,6 +52,8 @@ class Planet:
         self.trail.append((int(self.x), int(self.y)))
         if len(self.trail) > 150:  # Limit trail length
             self.trail.pop(0)
+            
+   
 
     def draw_trail(self, screen):
         # for point in self.trail:
@@ -91,6 +101,7 @@ while running:
     pygame.gfxdraw.aacircle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
     
     for i, planet in enumerate(planets):
+        draw_dashed_circle(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
         planet.update_position()
         planet.draw(screen)
         planet.draw_label(screen, planet_names[i])
