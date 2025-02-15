@@ -41,8 +41,12 @@ class Planet:
     def draw_trail(self, screen):
         # for point in self.trail:
         #     pygame.draw.circle(screen, self.color, point, 2)  # Small dots for trail
-        if len(self.trail) > 2:  # Ensure enough points for a smooth curve
-            pygame.draw.lines(screen, self.color,False, self.trail)
+        # if len(self.trail) > 2:  # Ensure enough points for a smooth curve
+        #     pygame.draw.aalines(screen, self.color,False, self.trail)
+        for i in range(len(self.trail) - 1):
+            alpha = int(255 * (i / len(self.trail)))  # Fades from 0 to 255
+            faded_color = (*self.color, alpha)  # Apply transparency
+            pygame.gfxdraw.line(screen, *self.trail[i], *self.trail[i + 1], faded_color)
 
     def draw(self, screen):
         # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
