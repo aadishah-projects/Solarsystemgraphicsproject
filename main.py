@@ -2,7 +2,6 @@ import pygame
 import math
 import pygame.gfxdraw 
 
-from orbit_button import *
 # Initialize Pygame
 pygame.init()
 pygame.font.init()
