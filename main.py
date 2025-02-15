@@ -149,7 +149,7 @@ while running:
         
         if show_moon:
             for moon in moons:
-                moon.update_position()
+                moon.update_position(zoom_factor, pan_x, pan_y)
                 moon.draw_orbit(screen, zoom_factor, pan_x, pan_y)  # Draw orbit path
                 moon.draw(screen, zoom_factor, pan_x, pan_y)  # Draw the moon
         

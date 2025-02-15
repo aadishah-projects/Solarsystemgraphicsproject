@@ -48,15 +48,15 @@ class Planet:
         if len(self.trail) < 2:
             return  # Not enough points to draw a smooth curve
 
-        transformed_trail = []
-        for x, y in self.trail:
-        # Keep trails attached to planet and apply zoom/pan correctly
-            zoomed_x = ((x - WIDTH // 2) * zoom_factor) + WIDTH // 2 + pan_x
-            zoomed_y = ((y - HEIGHT // 2) * zoom_factor) + HEIGHT // 2 + pan_y
-            transformed_trail.append((int(zoomed_x), int(zoomed_y)))
+        # transformed_trail = []
+        # for x, y in self.trail:
+        # # Keep trails attached to planet and apply zoom/pan correctly
+        #     zoomed_x = ((x - WIDTH // 2) * zoom_factor) + WIDTH // 2 + pan_x
+        #     zoomed_y = ((y - HEIGHT // 2) * zoom_factor) + HEIGHT // 2 + pan_y
+        #     transformed_trail.append((int(zoomed_x), int(zoomed_y)))
 
         # Smooth trail rendering
-        pygame.draw.aalines(screen, self.color, False, transformed_trail)
+        pygame.draw.aalines(screen, self.color, False, self.trail)
     
     def draw(self, screen,zoom_factor, pan_x, pan_y):
         # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)

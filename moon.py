@@ -10,22 +10,32 @@ class Moon:
         self.angle = 0
         self.speed = speed  # Moon's orbit speed
     
-    def update_position(self):
+    def update_position(self,zoom_factor, pan_x, pan_y):
         self.angle += self.speed
-        self.x = self.planet.x + self.orbit_radius * math.cos(self.angle)
-        self.y = self.planet.y + self.orbit_radius * math.sin(self.angle)
 
+        # Debug by Deepseek: 
+        self.x = self.planet.x + self.orbit_radius * zoom_factor * math.cos(self.angle)
+        self.y = self.planet.y + self.orbit_radius * zoom_factor * math.sin(self.angle)
+        
     def draw_orbit(self, screen, zoom_factor, pan_x, pan_y):
         #  """Draw moon orbit with zoom and panning."""
-        zoomed_x = (self.planet.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
-        zoomed_y = (self.planet.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
-        zoomed_radius = self.orbit_radius * zoom_factor
-        pygame.draw.circle(screen, (100, 100, 100), (int(zoomed_x), int(zoomed_y)), int(zoomed_radius), 1)
-    
+        # zoomed_x = (self.planet.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
+        # zoomed_y = (self.planet.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
+        # zoomed_radius = self.orbit_radius * zoom_factor
+        pygame.draw.circle(
+        screen, 
+        (100, 100, 100), 
+        (int(self.planet.x), int(self.planet.y)), 
+        int(self.orbit_radius * zoom_factor), 
+        1
+    )
     def draw(self, screen, zoom_factor, pan_x, pan_y):
         # """Draw the moon at its updated position."""
-        zoomed_x = (self.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
-        zoomed_y = (self.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
-        zoomed_size = max(1, int(self.size * zoom_factor))  # Prevent disappearing at small zoom
-        
-        pygame.draw.circle(screen, self.color, (int(zoomed_x), int(zoomed_y)), zoomed_size)
+        # Moon's position is already correct; only scale its size
+        zoomed_size = max(1, int(self.size * zoom_factor))
+        pygame.draw.circle(
+            screen, 
+            self.color, 
+            (int(self.x), int(self.y)), 
+            zoomed_size
+        )
