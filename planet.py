@@ -3,7 +3,7 @@ from settings import*
 
 #Planet Class
 class Planet:
-    def __init__(self, x, y, radius, color, texture_path, orbit_radius, speed,ellipse_a=1.2, ellipse_b=0.8):
+    def __init__(self, x, y, radius, color, texture_path, orbit_radius, speed,rotation_speed,ellipse_a=1.2, ellipse_b=0.8):
         self.x = x
         self.y = y
         self.radius = radius
@@ -19,12 +19,17 @@ class Planet:
          # Load texture
         self.image = pygame.image.load(texture_path)
         self.image = pygame.transform.scale(self.image, (2 * radius, 2 * radius))
+        
+        # Rotation
+        self.rotation_angle = 0  # Start at 0 degrees
+        self.rotation_speed = rotation_speed  # Speed of self-rotation
 
     def draw_label(self, screen, name):
         text = font.render(name, True, WHITE)  # Create text surface
         screen.blit(text, (self.x + self.radius + 5, self.y - self.radius - 5))  # Offset label
 
     def update_position(self):
+        # Orbital motion
         self.angle += self.speed
         self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle) * self.ellipse_a
         self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle) * self.ellipse_b
@@ -33,7 +38,9 @@ class Planet:
         self.trail.append((int(self.x), int(self.y)))
         if len(self.trail) > 150:  # Limit trail length
             self.trail.pop(0)
-            
+        
+        #Rotational motion
+        self.rotation_angle += self.rotation_speed
    
 
     def draw_trail(self, screen):
@@ -54,4 +61,9 @@ class Planet:
 
     def draw_textures(self,screen):
         self.draw_trail(screen)
-        screen.blit(self.image, (int(self.x - self.radius), int(self.y - self.radius)))
+
+        rotated_texture = pygame.transform.rotate(self.image, -self.rotation_angle)
+        rect = rotated_texture.get_rect(center=(int(self.x), int(self.y)))
+
+        # screen.blit(self.image, (int(self.x - self.radius), int(self.y - self.radius)))
+        screen.blit(rotated_texture, rect.topleft)
