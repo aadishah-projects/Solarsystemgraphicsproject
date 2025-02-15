@@ -2,6 +2,7 @@ import pygame
 import math
 import pygame.gfxdraw 
 
+from orbit_button import *
 # Initialize Pygame
 pygame.init()
 pygame.font.init()
@@ -13,24 +14,38 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 SUN_COLOR = (255, 204, 0)
 PLANET_COLORS = [(169, 169, 169),(255, 223, 186),(0, 102, 204),(255, 77, 77),(204, 153, 102),(255, 204, 102),(173, 216, 230),(0, 0, 128)]
+show_orbits = True  # Initially, orbits are visible
 
 # Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
 pygame.display.set_caption("Solar System Simulation")
 
+# Orbits
+def draw_dashed_ellipse(surface, center, radius, color, a_scale=1.2, b_scale=0.8, dash_length=10, gap_length=5):
+    for angle in range(0, 360, 15):
+        start_x = center[0] + radius * math.cos(math.radians(angle)) * a_scale
+        start_y = center[1] + radius * math.sin(math.radians(angle)) * b_scale
+        end_x = center[0] + radius * math.cos(math.radians(angle + 10)) * a_scale
+        end_y = center[1] + radius * math.sin(math.radians(angle + 10)) * b_scale
+        pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), 1)
 
-# def draw_dashed_circle(surface, center, radius, color, dash_length=10, gap_length=5):
-#     for angle in range(0, 360, dash_length + gap_length):
-#         start_x = center[0] + radius * math.cos(math.radians(angle))
-#         start_y = center[1] + radius * math.sin(math.radians(angle))
-#         end_x = center[0] + radius * math.cos(math.radians(angle + dash_length))
-#         end_y = center[1] + radius * math.sin(math.radians(angle + dash_length))
+#button
+def draw_button(screen):
+    color = (100, 100, 100) if show_orbits else (50, 50, 50)  # Change color when off
+    pygame.draw.rect(screen, color, (1130,50, 100, 30))  # Button rectangle
+    text = font.render("Orbits: ON" if show_orbits else "Orbits: OFF", True, WHITE)
+    screen.blit(text, (1135, 58))
 
-#         pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), 1)
+def check_button_click(pos):
+    global show_orbits
+    button_x, button_y, button_width, button_height = 1130, 50, 100, 30  # Button position & size
+    
+    if button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height:
+        show_orbits = not show_orbits
 
 #Planet Class
 class Planet:
-    def __init__(self, x, y, radius, color, orbit_radius, speed):
+    def __init__(self, x, y, radius, color, orbit_radius, speed,ellipse_a=1.2, ellipse_b=0.8):
         self.x = x
         self.y = y
         self.radius = radius
@@ -40,6 +55,8 @@ class Planet:
         # self.speed = speed  # Angular velocity
         self.speed = speed * (1.0 / math.sqrt(max(self.orbit_radius, 1)))  
         self.trail = []
+        self.ellipse_a = ellipse_a  # Stretch along x-axis
+        self.ellipse_b = ellipse_b  # Stretch along y-axis
     
     def draw_label(self, screen, name):
         text = font.render(name, True, WHITE)  # Create text surface
@@ -47,8 +64,8 @@ class Planet:
 
     def update_position(self):
         self.angle += self.speed
-        self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle)
-        self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle)
+        self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle) * self.ellipse_a
+        self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle) * self.ellipse_b
 
         # Store the position for the trail 
         self.trail.append((int(self.x), int(self.y)))
@@ -92,25 +109,38 @@ FPS = 144
 planet_names = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
 
 running = True
+
+
+
 while running:
     screen.fill(BLACK)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:  # Press 'O' to toggle orbits
+            if event.key == pygame.K_o:
+                show_orbits = not show_orbits
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            check_button_click(pygame.mouse.get_pos())
 
     # sun.draw(screen)
     pygame.gfxdraw.filled_circle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
     pygame.gfxdraw.aacircle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
     
+    
     for i, planet in enumerate(planets):
-        # draw_dashed_circle(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
+        if show_orbits:
+            draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
         planet.update_position()
         planet.draw(screen)
         planet.draw_label(screen, planet_names[i])
+        draw_button(screen)
     # for planet in planets:
     #     planet.update_position()
     #     planet.draw(screen)
 
     pygame.display.update()
     clock.tick(FPS)
+
+
 pygame.quit()

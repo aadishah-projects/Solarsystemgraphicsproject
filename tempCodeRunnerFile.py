@@ -1,1 +1,1 @@
-draw_dashed_circle(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
+if 50 <= pos[0] <= 130 and 50 <= pos[1] <= 80:  # Check if clicked
