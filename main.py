@@ -4,6 +4,8 @@ from orbit import *
 from planet import *
 from button import *
 from panel import *
+from starrybg import *
+from sun import *
 # Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
 pygame.display.set_caption("Solar System Simulation")
@@ -61,34 +63,6 @@ def check_planet_click(pos, planets, panel):
 #     if button_x_2 <= pos[0] <= button_x_2 + button_width_2 and button_y_2 <= pos[1] <= button_y_2 + button_height_2:
 #         show_textures = not show_textures
 
-sun_texture = pygame.image.load("assets/sun.png")
-sun_texture = pygame.transform.scale(sun_texture, (2 *  30, 2 *  30))
-
-def draw_textures_sun(screen,sun_texture, zoom_factor, pan_x, pan_y):
-    # Adjust sun position for zoom and pan
-    sun_x = (WIDTH // 2 - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
-    sun_y = (HEIGHT // 2 - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
-    sun_size = int(60 * zoom_factor)  # Adjust sun size dynamically
-
-    # Scale texture
-    scaled_sun = pygame.transform.smoothscale(sun_texture, (sun_size, sun_size))
-
-    # Centered positioning
-    rect = scaled_sun.get_rect(center=(int(sun_x), int(sun_y)))
-
-    # Draw sun texture
-    screen.blit(scaled_sun, rect.topleft)
-    
-
-
-def draw_sun(screen,zoom_factor, pan_x, pan_y):
-    sun_x = (WIDTH // 2 - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
-    sun_y = (HEIGHT // 2 - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
-    sun_radius = int(30 * zoom_factor)  # Scale sun size
-
-    # Draw sun with zoom
-    pygame.gfxdraw.filled_circle(screen, int(sun_x), int(sun_y), sun_radius, SUN_COLOR)
-    pygame.gfxdraw.aacircle(screen, int(sun_x), int(sun_y), sun_radius, SUN_COLOR)
 
 clock = pygame.time.Clock()
 FPS = 144
@@ -98,6 +72,8 @@ info_panel = InfoPanel(850, 50, 250, 150)
 running = True
 while running:
     screen.fill(BLACK)
+    draw_starry_background(screen)  # Draw stars
+      # Draw sun flare
     # inputs
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -139,6 +115,9 @@ while running:
     
     for i, planet in enumerate(planets):
         
+        if show_trails:
+            planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
+            
         if show_orbits:
             draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
         
@@ -148,9 +127,7 @@ while running:
             planet.draw_textures(screen,zoom_factor,pan_x,pan_y)
         else:
             planet.draw(screen,zoom_factor, pan_x, pan_y)
-        if show_trails:
-            planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
-            
+
         planet.draw_label(screen, planet_names[i])
         draw_button_1(screen)
         draw_button_2(screen)
