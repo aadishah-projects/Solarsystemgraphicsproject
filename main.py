@@ -4,6 +4,8 @@ import pygame.gfxdraw
 
 # Initialize Pygame
 pygame.init()
+pygame.font.init()
+font = pygame.font.Font(None, 24)  # Default font, size 24
 
 # Constants
 WIDTH, HEIGHT = 1280, 720
@@ -28,6 +30,10 @@ class Planet:
         # self.speed = speed  # Angular velocity
         self.speed = speed * (1.0 / math.sqrt(max(self.orbit_radius, 1)))  
         self.trail = []
+    
+    def draw_label(self, screen, name):
+        text = font.render(name, True, WHITE)  # Create text surface
+        screen.blit(text, (self.x + self.radius + 5, self.y - self.radius - 5))  # Offset label
 
     def update_position(self):
         self.angle += self.speed
@@ -71,6 +77,8 @@ planets = [
 clock = pygame.time.Clock()
 FPS = 144
 # Main loop
+planet_names = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+
 running = True
 while running:
     screen.fill(BLACK)
@@ -81,10 +89,14 @@ while running:
     # sun.draw(screen)
     pygame.gfxdraw.filled_circle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
     pygame.gfxdraw.aacircle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
-
-    for planet in planets:
+    
+    for i, planet in enumerate(planets):
         planet.update_position()
         planet.draw(screen)
+        planet.draw_label(screen, planet_names[i])
+    # for planet in planets:
+    #     planet.update_position()
+    #     planet.draw(screen)
 
     pygame.display.update()
     clock.tick(FPS)
