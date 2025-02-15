@@ -29,11 +29,11 @@ class Planet:
         text = font.render(name, True, WHITE)  # Create text surface
         screen.blit(text, (self.x + self.radius + 5, self.y - self.radius - 5))  # Offset label
 
-    def update_position(self):
+    def update_position(self,zoom_factor, pan_x, pan_y):
         # Orbital motion
         self.angle += self.speed
-        self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle) * self.ellipse_a
-        self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle) * self.ellipse_b
+        self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle) * self.ellipse_a *zoom_factor + pan_x
+        self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle) * self.ellipse_b * zoom_factor + pan_y
 
         # Store the position for the trail 
         self.trail.append((int(self.x), int(self.y)))
@@ -44,27 +44,40 @@ class Planet:
         self.rotation_angle += self.rotation_speed
    
 
-    def draw_trail(self, screen):
-        # for point in self.trail:
-        #     pygame.draw.circle(screen, self.color, point, 2)  # Small dots for trail
-        # if len(self.trail) > 2:  # Ensure enough points for a smooth curve
-        #     pygame.draw.aalines(screen, self.color,False, self.trail)
-        for i in range(len(self.trail) - 1):
-            alpha = int(255 * (i / len(self.trail)))  # Fades from 0 to 255
-            faded_color = (*self.color, alpha)  # Apply transparency
-            pygame.gfxdraw.line(screen, *self.trail[i], *self.trail[i + 1], faded_color)
+    def draw_trail(self, screen,zoom_factor, pan_x, pan_y):
+        if len(self.trail) < 2:
+            return  # Not enough points to draw a smooth curve
 
-    def draw(self, screen):
+        transformed_trail = []
+        for x, y in self.trail:
+        # Keep trails attached to planet and apply zoom/pan correctly
+            zoomed_x = ((x - WIDTH // 2) * zoom_factor) + WIDTH // 2 + pan_x
+            zoomed_y = ((y - HEIGHT // 2) * zoom_factor) + HEIGHT // 2 + pan_y
+            transformed_trail.append((int(zoomed_x), int(zoomed_y)))
+
+        # Smooth trail rendering
+        pygame.draw.aalines(screen, self.color, False, transformed_trail)
+    
+    def draw(self, screen,zoom_factor, pan_x, pan_y):
         # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
-        self.draw_trail(screen)
-        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), self.radius, self.color)  # Smooth circle
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), self.radius, self.color) 
+        
+        scaled_radius = int(self.radius * zoom_factor)
+        pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), scaled_radius, self.color)  # Smooth circle
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), scaled_radius, self.color) 
 
-    def draw_textures(self,screen):
-        self.draw_trail(screen)
+    def draw_textures(self,screen,zoom_factor, pan_x , pan_y):
+        # Apply zoom to texture size
+        scaled_size = int(self.radius * 2 * zoom_factor)
+        scaled_texture = pygame.transform.scale(self.image, (scaled_size, scaled_size))
 
-        rotated_texture = pygame.transform.rotate(self.image, -self.rotation_angle)
+        rotated_texture = pygame.transform.rotate(scaled_texture, -self.rotation_angle)
+
+
+        # Apply zoom & pan to position
+        draw_x = (self.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
+        draw_y = (self.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
+
+
         rect = rotated_texture.get_rect(center=(int(self.x), int(self.y)))
-
         # screen.blit(self.image, (int(self.x - self.radius), int(self.y - self.radius)))
         screen.blit(rotated_texture, rect.topleft)

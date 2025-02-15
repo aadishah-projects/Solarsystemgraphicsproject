@@ -28,12 +28,22 @@ planets = [
 def check_button_click(pos):
     global show_orbits
     global show_textures
+    global show_trails, zoom_factor, pan_x, pan_y
+
     button_x, button_y, button_width, button_height = 1130, 50, 100, 30  # Button position & size
     button_x_2, button_y_2, button_width_2, button_height_2 = 1130, 90, 100, 30  # Button position & size
+    button_x_3, button_y_3, button_width_3, button_height_3 = 1130, 130, 100, 30  # Button position & size
+    button_x_4, button_y_4, button_width_4, button_height_4 = 1130, 170, 100, 30  # Button position & size
+
     if button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height:
         show_orbits = not show_orbits
     if button_x_2 <= pos[0] <= button_x_2 + button_width_2 and button_y_2 <= pos[1] <= button_y_2 + button_height_2:
         show_textures = not show_textures
+    if button_x_3 <= pos[0] <= button_x_3 + button_width_3 and button_y_3 <= pos[1] <= button_y_3 + button_height_3:
+        show_trails = not show_trails
+    if button_x_4 <= pos[0] <= button_x_4 + button_width_4 and button_y_4 <= pos[1] <= button_y_4 + button_height_4:
+        zoom_factor = 1.0
+        pan_x, pan_y = 0, 0  # Reset position
 
 def check_planet_click(pos, planets, panel):
     for planet in planets:
@@ -43,10 +53,42 @@ def check_planet_click(pos, planets, panel):
             return
     panel.hide()  # Hide panel if clicked elsewhere
 
-def draw_textures_sun(screen):
-    image = pygame.image.load("assets/sun.png")
-    image = pygame.transform.scale(image, (2 *  30, 2 *  30))
-    screen.blit(image, (int(640 -  30), int(360 -  30)))
+# def  check_zoom_click(pos):
+#     global show_orbits
+#     button_x_2, button_y_2, button_width_2, button_height_2 = 1130, 90, 100, 30  # Button position & size
+#     if button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height:
+#         show_orbits = not show_orbits
+#     if button_x_2 <= pos[0] <= button_x_2 + button_width_2 and button_y_2 <= pos[1] <= button_y_2 + button_height_2:
+#         show_textures = not show_textures
+
+sun_texture = pygame.image.load("assets/sun.png")
+sun_texture = pygame.transform.scale(sun_texture, (2 *  30, 2 *  30))
+
+def draw_textures_sun(screen,sun_texture, zoom_factor, pan_x, pan_y):
+    # Adjust sun position for zoom and pan
+    sun_x = (WIDTH // 2 - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
+    sun_y = (HEIGHT // 2 - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
+    sun_size = int(60 * zoom_factor)  # Adjust sun size dynamically
+
+    # Scale texture
+    scaled_sun = pygame.transform.smoothscale(sun_texture, (sun_size, sun_size))
+
+    # Centered positioning
+    rect = scaled_sun.get_rect(center=(int(sun_x), int(sun_y)))
+
+    # Draw sun texture
+    screen.blit(scaled_sun, rect.topleft)
+    
+
+
+def draw_sun(screen,zoom_factor, pan_x, pan_y):
+    sun_x = (WIDTH // 2 - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
+    sun_y = (HEIGHT // 2 - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
+    sun_radius = int(30 * zoom_factor)  # Scale sun size
+
+    # Draw sun with zoom
+    pygame.gfxdraw.filled_circle(screen, int(sun_x), int(sun_y), sun_radius, SUN_COLOR)
+    pygame.gfxdraw.aacircle(screen, int(sun_x), int(sun_y), sun_radius, SUN_COLOR)
 
 clock = pygame.time.Clock()
 FPS = 144
@@ -56,37 +98,65 @@ info_panel = InfoPanel(850, 50, 250, 150)
 running = True
 while running:
     screen.fill(BLACK)
+    # inputs
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:  # Press 'O' to toggle orbits
             if event.key == pygame.K_o:
                 show_orbits = not show_orbits
+
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            check_button_click(pygame.mouse.get_pos())
-            check_planet_click(pygame.mouse.get_pos(), planets, info_panel)
+            if event.button == 4:  # Scroll Up (Zoom In)
+                zoom_factor *= 1.1
+            elif event.button == 5:  # Scroll Down (Zoom Out)
+                zoom_factor /= 1.1
+            elif event.button == 1:  # Left Click (Start Dragging)
+                dragging = True
+                last_mouse_pos = pygame.mouse.get_pos()
+                check_button_click(pygame.mouse.get_pos())
+                check_planet_click(pygame.mouse.get_pos(), planets, info_panel)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:  # Left Click Release (Stop Dragging)
+                dragging = False
+        
+        elif event.type == pygame.MOUSEMOTION and dragging:
+        # 🖱️ Calculate Mouse Drag Distance
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            dx = mouse_x - last_mouse_pos[0]
+            dy = mouse_y - last_mouse_pos[1]
+
+            pan_x += dx
+            pan_y += dy
+            last_mouse_pos = (mouse_x, mouse_y)  # Update last position
+    
+    
     # sun.draw(screen)
     if show_textures:
-        draw_textures_sun(screen)
+        draw_textures_sun(screen,sun_texture, zoom_factor, pan_x, pan_y)
     else :     
-        pygame.gfxdraw.filled_circle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
-        pygame.gfxdraw.aacircle(screen, WIDTH // 2, HEIGHT // 2, 30, SUN_COLOR)
+        draw_sun(screen,zoom_factor, pan_x, pan_y)
     
     for i, planet in enumerate(planets):
         
         if show_orbits:
             draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
         
-        planet.update_position()
+        planet.update_position(zoom_factor, pan_x, pan_y)
 
         if show_textures:
-            planet.draw_textures(screen)
+            planet.draw_textures(screen,zoom_factor,pan_x,pan_y)
         else:
-            planet.draw(screen)
-        
+            planet.draw(screen,zoom_factor, pan_x, pan_y)
+        if show_trails:
+            planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
+            
         planet.draw_label(screen, planet_names[i])
         draw_button_1(screen)
         draw_button_2(screen)
+        draw_button_3(screen)
+        draw_button_4(screen)
+        
     # for planet in planets:
     #     planet.update_position()
     #     planet.draw(screen)

@@ -13,3 +13,16 @@ def draw_button_2(screen):
     text = font.render("Texture: ON" if show_textures else "Texture: OFF", True, WHITE)
     screen.blit(text, (1135, 98))
 
+def draw_button_3(screen):
+    # """Draws the toggle trail and reset zoom buttons."""
+    # Trail Toggle Button
+        trail_color = (100, 100, 100) if show_trails else (50, 50, 50)
+        pygame.draw.rect(screen, trail_color, (1130, 130,100, 30))
+        text = font.render("Trails: ON" if show_trails else "Trails: OFF", True, WHITE)
+        screen.blit(text, (1135, 138))
+    
+def draw_button_4(screen):
+     # Reset Zoom Button
+        pygame.draw.rect(screen, (100, 100, 255), (1130, 170, 100, 30))
+        text = font.render("Reset View", True, WHITE)
+        screen.blit(text, (1135, 178))
