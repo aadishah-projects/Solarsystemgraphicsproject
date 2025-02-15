@@ -3,25 +3,27 @@ from settings import*
 from orbit import *
 from planet import *
 from button import *
-
+from panel import *
 # Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
 pygame.display.set_caption("Solar System Simulation")
 
 
 # Solar System Objects
-sun = Planet(640, 360, 30, SUN_COLOR, "assets/sun.png", 0, 0,2)
-planets = [
-    Planet(WIDTH // 2, HEIGHT // 2, 10, PLANET_COLORS[0], "assets/mercury.png", 60, 0.08,2),
-    Planet(WIDTH // 2, HEIGHT // 2, 12, PLANET_COLORS[1],"assets/venus.png", 110, 0.06,1.5),
-    Planet(WIDTH // 2, HEIGHT // 2, 14, PLANET_COLORS[2],"assets/earth.png", 160, 0.05,2),
-    Planet(WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[3],"assets/march.png", 210, 0.04,1),
-    Planet(WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[4],"assets/jupiter.png", 320, 0.02,1.5),
-    Planet(WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[5],"assets/saturn.png", 420, 0.015,2),
-    Planet(WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[6],"assets/neptune.png", 520, 0.01,1),
-    Planet(WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[7],"assets/uranus.png", 600, 0.07,2.5)
-]
+sun = Planet("sun",640, 360, 30, SUN_COLOR, "assets/sun.png", 0, 0,2)
 planet_names = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+
+
+planets = [
+    Planet(planet_names[0],WIDTH // 2, HEIGHT // 2, 10, PLANET_COLORS[0], "assets/mercury.png", 60, 0.08,2),
+    Planet(planet_names[1],WIDTH // 2, HEIGHT // 2, 12, PLANET_COLORS[1],"assets/venus.png", 110, 0.06,1.5),
+    Planet(planet_names[2],WIDTH // 2, HEIGHT // 2, 14, PLANET_COLORS[2],"assets/earth.png", 160, 0.05,2),
+    Planet(planet_names[3],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[3],"assets/march.png", 210, 0.04,1),
+    Planet(planet_names[4],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[4],"assets/jupiter.png", 320, 0.02,1.5),
+    Planet(planet_names[5],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[5],"assets/saturn.png", 420, 0.015,2),
+    Planet(planet_names[6],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[6],"assets/neptune.png", 520, 0.01,1),
+    Planet(planet_names[7],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[7],"assets/uranus.png", 600, 0.07,2.5)
+]
 
 def check_button_click(pos):
     global show_orbits
@@ -32,7 +34,15 @@ def check_button_click(pos):
         show_orbits = not show_orbits
     if button_x_2 <= pos[0] <= button_x_2 + button_width_2 and button_y_2 <= pos[1] <= button_y_2 + button_height_2:
         show_textures = not show_textures
-  
+
+def check_planet_click(pos, planets, panel):
+    for planet in planets:
+        dist = math.sqrt((pos[0] - planet.x) ** 2 + (pos[1] - planet.y) ** 2)
+        if dist < planet.radius:  # If click is inside the planet
+            panel.show(planet)
+            return
+    panel.hide()  # Hide panel if clicked elsewhere
+
 def draw_textures_sun(screen):
     image = pygame.image.load("assets/sun.png")
     image = pygame.transform.scale(image, (2 *  30, 2 *  30))
@@ -40,6 +50,8 @@ def draw_textures_sun(screen):
 
 clock = pygame.time.Clock()
 FPS = 144
+info_panel = InfoPanel(850, 50, 250, 150)
+
 # Main loop
 running = True
 while running:
@@ -52,7 +64,7 @@ while running:
                 show_orbits = not show_orbits
         elif event.type == pygame.MOUSEBUTTONDOWN:
             check_button_click(pygame.mouse.get_pos())
-
+            check_planet_click(pygame.mouse.get_pos(), planets, info_panel)
     # sun.draw(screen)
     if show_textures:
         draw_textures_sun(screen)
@@ -78,6 +90,7 @@ while running:
     # for planet in planets:
     #     planet.update_position()
     #     planet.draw(screen)
+    info_panel.draw(screen, font)  # Draw info panel if visible
 
     pygame.display.update()
     clock.tick(FPS)

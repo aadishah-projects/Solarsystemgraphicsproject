@@ -3,7 +3,8 @@ from settings import*
 
 #Planet Class
 class Planet:
-    def __init__(self, x, y, radius, color, texture_path, orbit_radius, speed,rotation_speed,ellipse_a=1.2, ellipse_b=0.8):
+    def __init__(self,name, x, y, radius, color, texture_path, orbit_radius, speed,rotation_speed,ellipse_a=1.2, ellipse_b=0.8):
+        self.name = name
         self.x = x
         self.y = y
         self.radius = radius
