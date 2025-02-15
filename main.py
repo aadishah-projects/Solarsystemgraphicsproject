@@ -6,6 +6,8 @@ from button import *
 from panel import *
 from starrybg import *
 from sun import *
+from moon import *
+
 # Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
 pygame.display.set_caption("Solar System Simulation")
@@ -27,15 +29,31 @@ planets = [
     Planet(planet_names[7],WIDTH // 2, HEIGHT // 2, 16, PLANET_COLORS[7],"assets/uranus.png", 600, 0.07,2.5)
 ]
 
+moon_data = {
+    "Earth": [(30, 4, (200, 200, 200), 0.1)],  # Moon
+    "Jupiter": [
+        (50, 5, (180, 180, 180), 0.05),  # Ganymede
+        (40, 4, (150, 150, 150), 0.07),  # Europa
+        (60, 3, (170, 170, 170), 0.03),  # Callisto
+        (35, 2, (140, 140, 140), 0.09),  # Io
+    ],
+    "Saturn": [
+        (45, 5, (190, 190, 190), 0.04),  # Titan
+        (35, 3, (160, 160, 160), 0.06),  # Enceladus
+        (30, 2, (140, 140, 140), 0.08),  # Mimas
+    ],
+}
+
 def check_button_click(pos):
     global show_orbits
     global show_textures
     global show_trails, zoom_factor, pan_x, pan_y
-
+    global show_moon
     button_x, button_y, button_width, button_height = 1130, 50, 100, 30  # Button position & size
     button_x_2, button_y_2, button_width_2, button_height_2 = 1130, 90, 100, 30  # Button position & size
     button_x_3, button_y_3, button_width_3, button_height_3 = 1130, 130, 100, 30  # Button position & size
     button_x_4, button_y_4, button_width_4, button_height_4 = 1130, 170, 100, 30  # Button position & size
+    button_x_5, button_y_5, button_width_5, button_height_5 = 1130, 210, 100, 30  # Button position & size
 
     if button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height:
         show_orbits = not show_orbits
@@ -46,6 +64,8 @@ def check_button_click(pos):
     if button_x_4 <= pos[0] <= button_x_4 + button_width_4 and button_y_4 <= pos[1] <= button_y_4 + button_height_4:
         zoom_factor = 1.0
         pan_x, pan_y = 0, 0  # Reset position
+    if button_x_5 <= pos[0] <= button_x_5 + button_width_5 and button_y_5 <= pos[1] <= button_y_5 + button_height_5:
+        show_moon = not show_moon
 
 def check_planet_click(pos, planets, panel):
     for planet in planets:
@@ -54,15 +74,6 @@ def check_planet_click(pos, planets, panel):
             panel.show(planet)
             return
     panel.hide()  # Hide panel if clicked elsewhere
-
-# def  check_zoom_click(pos):
-#     global show_orbits
-#     button_x_2, button_y_2, button_width_2, button_height_2 = 1130, 90, 100, 30  # Button position & size
-#     if button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height:
-#         show_orbits = not show_orbits
-#     if button_x_2 <= pos[0] <= button_x_2 + button_width_2 and button_y_2 <= pos[1] <= button_y_2 + button_height_2:
-#         show_textures = not show_textures
-
 
 clock = pygame.time.Clock()
 FPS = 144
@@ -113,31 +124,44 @@ while running:
     else :     
         draw_sun(screen,zoom_factor, pan_x, pan_y)
     
+    moons = []
+
+    for planet in planets:
+        if planet.name in moon_data:
+            for moon_info in moon_data[planet.name]:
+                orbit_radius, size, color, speed = moon_info
+                moons.append(Moon(planet, orbit_radius, size, color, speed))
+
     for i, planet in enumerate(planets):
-        
+        planet.update_position(zoom_factor, pan_x, pan_y)
+
         if show_trails:
             planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
-            
         if show_orbits:
             draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
         
-        planet.update_position(zoom_factor, pan_x, pan_y)
-
         if show_textures:
             planet.draw_textures(screen,zoom_factor,pan_x,pan_y)
         else:
             planet.draw(screen,zoom_factor, pan_x, pan_y)
 
         planet.draw_label(screen, planet_names[i])
-        draw_button_1(screen)
-        draw_button_2(screen)
-        draw_button_3(screen)
-        draw_button_4(screen)
         
-    # for planet in planets:
-    #     planet.update_position()
-    #     planet.draw(screen)
-    info_panel.draw(screen, font)  # Draw info panel if visible
+        if show_moon:
+            for moon in moons:
+                moon.update_position()
+                moon.draw_orbit(screen, zoom_factor, pan_x, pan_y)  # Draw orbit path
+                moon.draw(screen, zoom_factor, pan_x, pan_y)  # Draw the moon
+        
+    # Draw info panel if visible
+    info_panel.draw(screen, font)
+    draw_button_1(screen)
+    draw_button_2(screen)
+    draw_button_3(screen)
+    draw_button_4(screen)
+    draw_button_5(screen)
+        
+    
 
     pygame.display.update()
     clock.tick(FPS)

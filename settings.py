@@ -10,6 +10,7 @@ show_orbits = False  # Initially, orbits are visible
 font = pygame.font.Font(None, 24)  # Default font, size 24
 show_textures = True
 show_trails = False
+show_moon = False
 # for zoom and pan:
 zoom_factor = 1.0  # Initial zoom level
 pan_x, pan_y = 0, 0  # Panning offsets

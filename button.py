@@ -26,3 +26,11 @@ def draw_button_4(screen):
         pygame.draw.rect(screen, (100, 100, 255), (1130, 170, 100, 30))
         text = font.render("Reset View", True, WHITE)
         screen.blit(text, (1135, 178))
+
+def draw_button_5(screen):
+     # Reset Zoom Button
+        # Trail Toggle Button
+        moon_color = (100, 100, 100) if show_moon else (50, 50, 50)
+        pygame.draw.rect(screen, moon_color, (1130, 210,100, 30))
+        text = font.render("Moon: ON" if show_trails else "Moon: OFF", True, WHITE)
+        screen.blit(text, (1135, 218))
