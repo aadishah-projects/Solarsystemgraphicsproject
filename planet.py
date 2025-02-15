@@ -3,7 +3,7 @@ from settings import*
 
 #Planet Class
 class Planet:
-    def __init__(self, x, y, radius, color, orbit_radius, speed,ellipse_a=1.2, ellipse_b=0.8):
+    def __init__(self, x, y, radius, color, texture_path, orbit_radius, speed,ellipse_a=1.2, ellipse_b=0.8):
         self.x = x
         self.y = y
         self.radius = radius
@@ -17,7 +17,7 @@ class Planet:
         self.ellipse_b = ellipse_b  # Stretch along y-axis
         
          # Load texture
-        self.image = pygame.image.load()
+        self.image = pygame.image.load(texture_path)
         self.image = pygame.transform.scale(self.image, (2 * radius, 2 * radius))
 
     def draw_label(self, screen, name):
@@ -50,4 +50,8 @@ class Planet:
         # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         self.draw_trail(screen)
         pygame.gfxdraw.filled_circle(screen, int(self.x), int(self.y), self.radius, self.color)  # Smooth circle
-        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), self.radius, self.color)  # Anti-aliasing
+        pygame.gfxdraw.aacircle(screen, int(self.x), int(self.y), self.radius, self.color) 
+
+    def draw_textures(self,screen):
+        self.draw_trail(screen)
+        screen.blit(self.image, (int(self.x - self.radius), int(self.y - self.radius)))
