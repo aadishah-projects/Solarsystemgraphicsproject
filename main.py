@@ -30,17 +30,17 @@ planets = [
 ]
 
 moon_data = {
-    "Earth": [(30, 4, (200, 200, 200), 0.1)],  # Moon
+    "Earth": [(30, 4, (200, 200, 200), 0.01)],  # Moon
     "Jupiter": [
-        (50, 5, (180, 180, 180), 0.05),  # Ganymede
-        (40, 4, (150, 150, 150), 0.07),  # Europa
-        (60, 3, (170, 170, 170), 0.03),  # Callisto
-        (35, 2, (140, 140, 140), 0.09),  # Io
+        (50, 5, (180, 180, 180), 0.005),  # Ganymede
+        (40, 4, (150, 150, 150), 0.007),  # Europa
+        (60, 3, (170, 170, 170), 0.003),  # Callisto
+        (35, 2, (140, 140, 140), 0.009),  # Io
     ],
     "Saturn": [
-        (45, 5, (190, 190, 190), 0.04),  # Titan
-        (35, 3, (160, 160, 160), 0.06),  # Enceladus
-        (30, 2, (140, 140, 140), 0.08),  # Mimas
+        (45, 5, (190, 190, 190), 0.004),  # Titan
+        (35, 3, (160, 160, 160), 0.006),  # Enceladus
+        (30, 2, (140, 140, 140), 0.008),  # Mimas
     ],
 }
 
@@ -79,11 +79,20 @@ clock = pygame.time.Clock()
 FPS = 144
 info_panel = InfoPanel(850, 50, 250, 150)
 
+moons = []
 # Main loop
+
+for planet in planets:
+    if planet.name in moon_data:
+        for moon_info in moon_data[planet.name]:
+            orbit_radius, size, color, speed = moon_info
+            moons.append(Moon(planet, orbit_radius, size, color, speed))
+            
+
 running = True
 while running:
     screen.fill(BLACK)
-    draw_starry_background(screen)  # Draw stars
+    draw_parallax_background(screen,pan_x,pan_y)  # Draw stars
       # Draw sun flare
     # inputs
     for event in pygame.event.get():
@@ -95,9 +104,9 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:  # Scroll Up (Zoom In)
-                zoom_factor *= 1.1
+                zoom_factor *= 1.05
             elif event.button == 5:  # Scroll Down (Zoom Out)
-                zoom_factor /= 1.1
+                zoom_factor /= 1.05
             elif event.button == 1:  # Left Click (Start Dragging)
                 dragging = True
                 last_mouse_pos = pygame.mouse.get_pos()
@@ -110,8 +119,8 @@ while running:
         elif event.type == pygame.MOUSEMOTION and dragging:
         # 🖱️ Calculate Mouse Drag Distance
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            dx = mouse_x - last_mouse_pos[0]
-            dy = mouse_y - last_mouse_pos[1]
+            dx = (mouse_x - last_mouse_pos[0])/3
+            dy = (mouse_y - last_mouse_pos[1])/3
 
             pan_x += dx
             pan_y += dy
@@ -124,13 +133,7 @@ while running:
     else :     
         draw_sun(screen,zoom_factor, pan_x, pan_y)
     
-    moons = []
 
-    for planet in planets:
-        if planet.name in moon_data:
-            for moon_info in moon_data[planet.name]:
-                orbit_radius, size, color, speed = moon_info
-                moons.append(Moon(planet, orbit_radius, size, color, speed))
 
     for i, planet in enumerate(planets):
         planet.update_position(zoom_factor, pan_x, pan_y)
@@ -138,7 +141,7 @@ while running:
         if show_trails:
             planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
         if show_orbits:
-            draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
+            draw_dashed_ellipse(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE, zoom_factor, pan_x, pan_y)
         
         if show_textures:
             planet.draw_textures(screen,zoom_factor,pan_x,pan_y)
