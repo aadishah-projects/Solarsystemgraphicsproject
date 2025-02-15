@@ -7,9 +7,9 @@ from panel import *
 from starrybg import *
 from sun import *
 from moon import *
-
+import pygame_gui
 # Screen setup
-screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SRCALPHA)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Solar System Simulation")
 
 
@@ -98,9 +98,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
         elif event.type == pygame.KEYDOWN:  # Press 'O' to toggle orbits
             if event.key == pygame.K_o:
                 show_orbits = not show_orbits
+            elif event.key == pygame.K_w:   # Increase speed
+                global_speed_factor *= 1.1
+            elif event.key == pygame.K_s:  # Decrease speed
+                global_speed_factor /= 1.1
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:  # Scroll Up (Zoom In)
@@ -125,7 +130,8 @@ while running:
             pan_x += dx
             pan_y += dy
             last_mouse_pos = (mouse_x, mouse_y)  # Update last position
-    
+
+
     
     # sun.draw(screen)
     if show_textures:
@@ -136,7 +142,7 @@ while running:
 
 
     for i, planet in enumerate(planets):
-        planet.update_position(zoom_factor, pan_x, pan_y)
+        planet.update_position(zoom_factor, pan_x, pan_y,global_speed_factor)
 
         if show_trails:
             planet.draw_trail(screen,zoom_factor, pan_x, pan_y)
@@ -152,7 +158,7 @@ while running:
         
         if show_moon:
             for moon in moons:
-                moon.update_position(zoom_factor, pan_x, pan_y)
+                moon.update_position(zoom_factor, pan_x, pan_y,global_speed_factor)
                 moon.draw_orbit(screen, zoom_factor, pan_x, pan_y)  # Draw orbit path
                 moon.draw(screen, zoom_factor, pan_x, pan_y)  # Draw the moon
         
@@ -163,10 +169,11 @@ while running:
     draw_button_3(screen)
     draw_button_4(screen)
     draw_button_5(screen)
-        
+    draw_button_6(screen,global_speed_factor)
     
+        
+  
 
     pygame.display.update()
     clock.tick(FPS)
-
 pygame.quit()

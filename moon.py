@@ -10,8 +10,8 @@ class Moon:
         self.angle = 0
         self.speed = speed  # Moon's orbit speed
     
-    def update_position(self,zoom_factor, pan_x, pan_y):
-        self.angle += self.speed
+    def update_position(self,zoom_factor, pan_x, pan_y,global_speed_factor):
+        self.angle += self.speed* global_speed_factor
 
         # Debug by Deepseek: 
         self.x = self.planet.x + self.orbit_radius * zoom_factor * math.cos(self.angle)

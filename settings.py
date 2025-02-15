@@ -1,5 +1,4 @@
 from import_init import*
-from settings import*
 # Constants
 WIDTH, HEIGHT = 1280, 720
 WHITE = (255, 255, 255)
@@ -16,3 +15,5 @@ zoom_factor = 1.0  # Initial zoom level
 pan_x, pan_y = 0, 0  # Panning offsets
 dragging = False  # To check if panning is active
 last_mouse_pos = (0, 0)  # Stores the last mouse position
+
+global_speed_factor = 1.0

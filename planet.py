@@ -29,9 +29,9 @@ class Planet:
         text = font.render(name, True, WHITE)  # Create text surface
         screen.blit(text, (self.x + self.radius + 5, self.y - self.radius - 5))  # Offset label
 
-    def update_position(self,zoom_factor, pan_x, pan_y):
+    def update_position(self,zoom_factor, pan_x, pan_y,global_speed_factor):
         # Orbital motion
-        self.angle += self.speed
+        self.angle += self.speed * global_speed_factor
         self.x = WIDTH // 2 + self.orbit_radius * math.cos(self.angle) * self.ellipse_a *zoom_factor + pan_x
         self.y = HEIGHT // 2 + self.orbit_radius * math.sin(self.angle) * self.ellipse_b * zoom_factor + pan_y
 
