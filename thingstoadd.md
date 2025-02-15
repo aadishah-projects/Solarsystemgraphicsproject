@@ -27,4 +27,4 @@ Here are some fundamental things you can add to your **Solar System Simulation**
 - **Background Music & SFX** 🎵: Add ambient space sounds or planet-specific effects.  
 - **Better UI Elements** 🖥️: Buttons for toggling features like trails, labels, or paths.  
 
-Would you like a more detailed breakdown or code snippets for any of these? 🚀
+Reference: https://www.youtube.com/watch?v=WTLPmUHTPqo

@@ -15,7 +15,11 @@ class Planet:
         self.trail = []
         self.ellipse_a = ellipse_a  # Stretch along x-axis
         self.ellipse_b = ellipse_b  # Stretch along y-axis
-    
+        
+         # Load texture
+        self.image = pygame.image.load()
+        self.image = pygame.transform.scale(self.image, (2 * radius, 2 * radius))
+
     def draw_label(self, screen, name):
         text = font.render(name, True, WHITE)  # Create text surface
         screen.blit(text, (self.x + self.radius + 5, self.y - self.radius - 5))  # Offset label
