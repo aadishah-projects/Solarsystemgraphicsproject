@@ -1,1 +1,1 @@
-HEIGHT // 2
+draw_dashed_circle(screen, (WIDTH // 2, HEIGHT // 2), planet.orbit_radius, WHITE)
