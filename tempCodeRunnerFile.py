@@ -1,1 +1,2 @@
-if 50 <= pos[0] <= 130 and 50 <= pos[1] <= 80:  # Check if clicked
+
+click_sound = pygame.mixer.Sound("assets/sound.wav")

@@ -42,3 +42,11 @@ def draw_button_6(screen,global_speed_factor):
         pygame.draw.rect(screen, speed_color, (1130, 250,100, 30))
         text = font.render(f"Speed: {round(global_speed_factor,2)}" , True, WHITE)
         screen.blit(text, (1135, 258))
+    
+def draw_button_7(screen):
+     # Reset Zoom Button
+        # Trail Toggle Button
+        speed_color = (100, 100, 100) 
+        pygame.draw.rect(screen, speed_color, (1130, 290,100, 30))
+        text = font.render(f"Darpan" , True, WHITE)
+        screen.blit(text, (1135, 298))

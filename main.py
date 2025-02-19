@@ -12,6 +12,14 @@ import pygame_gui
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Solar System Simulation")
 
+# Button Clicks Sound
+pygame.mixer.init()
+click_sound = pygame.mixer.Sound("assets/sound.wav")
+click_sound.set_volume(0.3)
+# Space Sound
+space_sound = pygame.mixer.Sound("assets/bg.wav")  # Load background sound
+space_sound.play(-1)
+space_sound.set_volume(0.5)
 
 # Solar System Objects
 sun = Planet("sun",640, 360, 30, SUN_COLOR, "assets/sun.png", 0, 0,2)
@@ -108,11 +116,13 @@ while running:
                 global_speed_factor /= 1.1
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            
             if event.button == 4:  # Scroll Up (Zoom In)
                 zoom_factor *= 1.05
             elif event.button == 5:  # Scroll Down (Zoom Out)
                 zoom_factor /= 1.05
             elif event.button == 1:  # Left Click (Start Dragging)
+                click_sound.play()
                 dragging = True
                 last_mouse_pos = pygame.mouse.get_pos()
                 check_button_click(pygame.mouse.get_pos())

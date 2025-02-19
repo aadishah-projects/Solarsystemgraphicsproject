@@ -74,8 +74,8 @@ class Planet:
 
 
         # Apply zoom & pan to position
-        draw_x = (self.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
-        draw_y = (self.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
+        # draw_x = (self.x - WIDTH // 2) * zoom_factor + WIDTH // 2 + pan_x
+        # draw_y = (self.y - HEIGHT // 2) * zoom_factor + HEIGHT // 2 + pan_y
 
 
         rect = rotated_texture.get_rect(center=(int(self.x), int(self.y)))
